@@ -20,7 +20,7 @@ def filedownload(df):
 
 # Model building
 def build_model(input_data):
-    model_path = "acetylcholinesterase_model.pkl.gz"
+    model_path = "acetylcholinesterase_model_218.pkl.gz"
     
     # Load the model from the compressed file
     with gzip.open(model_path, 'rb') as model_file:
