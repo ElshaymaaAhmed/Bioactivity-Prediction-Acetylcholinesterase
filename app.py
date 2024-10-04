@@ -5,6 +5,7 @@ import subprocess
 import os
 import base64
 import pickle
+import gdown
 
 def desc_calc():
     # Load precomputed descriptors
@@ -17,17 +18,28 @@ def filedownload(df):
     b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
     href = f'<a href="data:file/csv;base64,{b64}" download="prediction.csv">Download Predictions</a>'
     return href
+    
+# "Upload the model `acetylcholinesterase_model.pkl`, which was saved as a Pickle object in the `4_Regression_Random_Forest.ipynb` notebook, from Google Drive due to its size exceeding GitHub's upload limit."
+model_url = 'https://drive.google.com/uc?export=download&id=1kMGdU12I37D0Gu5Y6cdUarsD80KD8_WL'  
+model_path = 'acetylcholinesterase_model.pkl'
 
 # Model building
 def build_model(input_data):
+    # Download the model from Google Drive
+    if not os.path.exists(model_path):
+        with st.spinner("Downloading model..."):
+            gdown.download(model_url, model_path, quiet=False)
     # Reads in saved regression model
-    load_model = pickle.load(open('acetylcholinesterase_model.pkl', 'rb'))
+    with open(model_path, 'rb') as model_file:
+        load_model = pickle.load(model_file)
     # Apply model to make predictions
     prediction = load_model.predict(input_data)
+    
     st.header('**Prediction output**')
     prediction_output = pd.Series(prediction, name='pIC50')
     molecule_name = pd.Series(load_data[1], name='molecule_name')
     df = pd.concat([molecule_name, prediction_output], axis=1)
+    
     st.write(df)
     st.markdown(filedownload(df), unsafe_allow_html=True)
 
