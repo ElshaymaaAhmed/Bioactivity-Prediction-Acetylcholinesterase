@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
-import subprocess
-import os
 import base64
 import pickle
-import gdown
+import gzip
 
 def desc_calc():
     # Load precomputed descriptors
@@ -18,20 +16,15 @@ def filedownload(df):
     b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
     href = f'<a href="data:file/csv;base64,{b64}" download="prediction.csv">Download Predictions</a>'
     return href
-    
-# "Upload the model `acetylcholinesterase_model.pkl`, which was saved as a Pickle object in the `4_Regression_Random_Forest.ipynb` notebook, from Google Drive due to its size exceeding GitHub's upload limit."
-model_url = 'https://drive.google.com/uc?export=download&id=1kMGdU12I37D0Gu5Y6cdUarsD80KD8_WL'
-model_path = 'acetylcholinesterase_model.pkl'
 
 # Model building
 def build_model(input_data):
-    # Download the model from Google Drive
-    if not os.path.exists(model_path):
-        with st.spinner("Downloading model..."):
-            gdown.download(model_url, model_path, quiet=False)
-    # Reads in saved regression model
-    with open(model_path, 'rb') as model_file:
+    model_path = "acetylcholinesterase_model.pkl.gz"
+    
+    # Load the model from the compressed file
+    with gzip.open(model_path, 'rb') as model_file:
         load_model = pickle.load(model_file)
+    
     # Apply model to make predictions
     prediction = load_model.predict(input_data)
     
@@ -39,9 +32,9 @@ def build_model(input_data):
     prediction_output = pd.Series(prediction, name='pIC50')
     molecule_name = pd.Series(load_data[1], name='molecule_name')
     df = pd.concat([molecule_name, prediction_output], axis=1)
-    
     st.write(df)
     st.markdown(filedownload(df), unsafe_allow_html=True)
+
 
 # APP Logo image
 image = Image.open('app_logo.png')
@@ -75,7 +68,7 @@ if st.sidebar.button('Predict'):
     with st.spinner("Calculating..."):
         desc_calc()
 
-    # Read in calculated descriptors and display the dataframe
+    # Read in calculated descriptors 
     desc = pd.read_csv('descriptors_output.csv')
    
     # Read descriptor list used in previously built model
