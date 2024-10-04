@@ -20,7 +20,7 @@ def filedownload(df):
     return href
     
 # "Upload the model `acetylcholinesterase_model.pkl`, which was saved as a Pickle object in the `4_Regression_Random_Forest.ipynb` notebook, from Google Drive due to its size exceeding GitHub's upload limit."
-model_url = 'https://drive.google.com/uc?export=download&id=1kMGdU12I37D0Gu5Y6cdUarsD80KD8_WL'  
+model_url = 'https://drive.google.com/file/d/1kMGdU12I37D0Gu5Y6cdUarsD80KD8_WL/view?usp=sharing'
 model_path = 'acetylcholinesterase_model.pkl'
 
 # Model building
