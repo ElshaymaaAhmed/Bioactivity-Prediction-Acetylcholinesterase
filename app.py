@@ -4,6 +4,7 @@ from PIL import Image
 import base64
 import pickle
 import gzip
+import sklearn
 
 def desc_calc():
     # Load precomputed descriptors
